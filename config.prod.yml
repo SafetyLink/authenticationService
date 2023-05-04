@@ -1,0 +1,5 @@
+grpc:
+  serviceName: AuthenticationService
+  port: :50052
+postgres:
+  connectionURL: jdbc:postgresql://localhost:5432/safteylink
