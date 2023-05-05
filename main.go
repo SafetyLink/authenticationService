@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/SafetyLink/authenticationService/internal"
 	"github.com/SafetyLink/authenticationService/internal/controller"
+	"github.com/SafetyLink/authenticationService/internal/infra/adapter/sql"
+	"github.com/SafetyLink/authenticationService/internal/infra/userRepository"
 	"github.com/SafetyLink/commons/config"
 	"github.com/SafetyLink/commons/logger"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"net"
 )
 
 func main() {
@@ -16,10 +19,17 @@ func main() {
 		fx.Provide(logger.InitLogger),
 		fx.Provide(config.ReadConfig[internal.Config]),
 
+		fx.Provide(sql.NewPostgresProvider),
+
+		fx.Provide(userRepository.NewUserRepository),
+
+		fx.Provide(SetupAuthenticationServiceGrpcServer),
+
 		fx.Provide(controller.NewAuthenticationServiceGrpcServer),
 		fx.Invoke(StartGrpcServer),
 	).Run()
 }
+
 func StartGrpcServer(lc fx.Lifecycle, grpcServer *controller.AuthenticationServiceGrpcServer, logger *zap.Logger, config *internal.Config) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -35,4 +45,13 @@ func StartGrpcServer(lc fx.Lifecycle, grpcServer *controller.AuthenticationServi
 			return nil
 		},
 	})
+}
+
+func SetupAuthenticationServiceGrpcServer(logger *zap.Logger, config *internal.Config) net.Listener {
+	lis, err := net.Listen("tcp", config.Grpc.Port)
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Failed to start %s grpc server", config.Grpc.ServiceName), zap.Error(err))
+	}
+
+	return lis
 }

@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewSqlProvider(logger *zap.Logger, config *internal.Config) *pgx.Conn {
+func NewPostgresProvider(logger *zap.Logger, config *internal.Config) *pgx.Conn {
 	conn, err := pgx.Connect(context.Background(), config.Postgres.ConnectionURL)
 	if err != nil {
 		logger.Panic("failed to connect to postgres")
