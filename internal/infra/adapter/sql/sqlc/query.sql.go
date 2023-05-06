@@ -11,41 +11,33 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, first_name, last_name, avatar_id, created_at, updated_at
-from users
-WHERE users.email = $1
-LIMIT 1
-`
-
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.Email,
-		&i.FirstName,
-		&i.LastName,
-		&i.AvatarID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, username, email, first_name, last_name, avatar_id, created_at, updated_at
+SELECT username,
+       email,
+       first_name,
+       last_name,
+       avatar_id,
+       created_at,
+       updated_at
 from users
 WHERE users.id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
+type GetUserByIDRow struct {
+	Username  string
+	Email     string
+	FirstName pgtype.Text
+	LastName  pgtype.Text
+	AvatarID  pgtype.Int8
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+}
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
-	var i User
+	var i GetUserByIDRow
 	err := row.Scan(
-		&i.ID,
 		&i.Username,
 		&i.Email,
 		&i.FirstName,
@@ -138,4 +130,47 @@ func (q *Queries) GetUserFriends(ctx context.Context, userID int64) ([]GetUserFr
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserSecurityByEmail = `-- name: GetUserSecurityByEmail :one
+SELECT id, username, email, first_name, last_name, avatar_id, created_at, users.updated_at, user_id, password, user_security.updated_at, device_id
+from users
+         INNER JOIN user_security ON users.id = user_security.user_id
+WHERE users.email = $1
+LIMIT 1
+`
+
+type GetUserSecurityByEmailRow struct {
+	ID          int64
+	Username    string
+	Email       string
+	FirstName   pgtype.Text
+	LastName    pgtype.Text
+	AvatarID    pgtype.Int8
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+	UserID      int64
+	Password    string
+	UpdatedAt_2 pgtype.Timestamptz
+	DeviceID    int64
+}
+
+func (q *Queries) GetUserSecurityByEmail(ctx context.Context, email string) (GetUserSecurityByEmailRow, error) {
+	row := q.db.QueryRow(ctx, getUserSecurityByEmail, email)
+	var i GetUserSecurityByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.FirstName,
+		&i.LastName,
+		&i.AvatarID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+		&i.Password,
+		&i.UpdatedAt_2,
+		&i.DeviceID,
+	)
+	return i, err
 }

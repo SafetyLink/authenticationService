@@ -1,13 +1,20 @@
 -- name: GetUserByID :one
-SELECT *
+SELECT username,
+       email,
+       first_name,
+       last_name,
+       avatar_id,
+       created_at,
+       updated_at
 from users
 WHERE users.id = $1
 LIMIT 1;
 
 
--- name: GetUserByEmail :one
+-- name: GetUserSecurityByEmail :one
 SELECT *
 from users
+         INNER JOIN user_security ON users.id = user_security.user_id
 WHERE users.email = $1
 LIMIT 1;
 
