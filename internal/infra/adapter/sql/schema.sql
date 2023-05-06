@@ -22,7 +22,7 @@ CREATE TABLE privacy
 
 );
 
-CREATE TABLE user_security
+CREATE TABLE account_security
 (
     user_id    BIGINT                          NOT NULL,
     password   VARCHAR(255)                    NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE session
 
 
 
-CREATE TABLE friend_list
+CREATE TABLE friend
 (
     id         BIGSERIAL,
     user_id    BIGINT NOT NULL,
@@ -60,3 +60,21 @@ CREATE TABLE friend_list
     FOREIGN KEY (friend_id) REFERENCES Users (id),
     UNIQUE (user_id, friend_id)
 );
+
+
+CREATE TABLE chat
+(
+    chat_id         BIGINT,
+    user_id         BIGINT NOT NULL,
+    friend_id       BIGINT NOT NULL,
+    unread_messages BIGINT                   DEFAULT 0,
+    last_message_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    viewed          BOOLEAN                  DEFAULT FALSE,
+    viewed_at       TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+
+    PRIMARY KEY (chat_id),
+    FOREIGN KEY (user_id) REFERENCES Users (id),
+    FOREIGN KEY (friend_id) REFERENCES Users (id),
+    UNIQUE (user_id, friend_id)
+)

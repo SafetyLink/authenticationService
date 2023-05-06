@@ -82,11 +82,11 @@ SELECT u.id as user_id,
        u.created_at,
        u.updated_at
 FROM (SELECT friend_id as user1_friend
-      FROM friend_list
-      WHERE friend_list.user_id = $1
+      FROM friend
+      WHERE friend.user_id = $1
       UNION
-      SELECT friend_list.user_id as user1_friend
-      FROM friend_list
+      SELECT friend.user_id as user1_friend
+      FROM friend
       WHERE friend_id = $1) as f
          INNER JOIN Users u ON f.user1_friend = u.id
 ORDER BY user_id
@@ -133,9 +133,9 @@ func (q *Queries) GetUserFriends(ctx context.Context, userID int64) ([]GetUserFr
 }
 
 const getUserSecurityByEmail = `-- name: GetUserSecurityByEmail :one
-SELECT id, username, email, first_name, last_name, avatar_id, created_at, users.updated_at, user_id, password, user_security.updated_at, device_id
+SELECT id, username, email, first_name, last_name, avatar_id, created_at, users.updated_at, user_id, password, account_security.updated_at, device_id
 from users
-         INNER JOIN user_security ON users.id = user_security.user_id
+         INNER JOIN account_security ON users.id = account_security.user_id
 WHERE users.email = $1
 LIMIT 1
 `

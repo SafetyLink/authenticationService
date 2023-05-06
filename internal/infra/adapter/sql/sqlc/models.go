@@ -8,7 +8,24 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type FriendList struct {
+type AccountSecurity struct {
+	UserID    int64
+	Password  string
+	UpdatedAt pgtype.Timestamptz
+	DeviceID  int64
+}
+
+type Chat struct {
+	ChatID         int64
+	UserID         int64
+	FriendID       int64
+	UnreadMessages pgtype.Int8
+	LastMessageAt  pgtype.Timestamptz
+	Viewed         pgtype.Bool
+	ViewedAt       pgtype.Timestamptz
+}
+
+type Friend struct {
 	ID        int64
 	UserID    int64
 	FriendID  int64
@@ -39,11 +56,4 @@ type User struct {
 	AvatarID  pgtype.Int8
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
-}
-
-type UserSecurity struct {
-	UserID    int64
-	Password  string
-	UpdatedAt pgtype.Timestamptz
-	DeviceID  int64
 }
