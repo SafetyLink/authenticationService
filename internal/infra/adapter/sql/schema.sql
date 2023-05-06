@@ -45,8 +45,6 @@ CREATE TABLE session
     FOREIGN KEY (user_id) REFERENCES Users (id)
 );
 
-
-
 CREATE TABLE friend
 (
     id         BIGSERIAL,
@@ -61,12 +59,11 @@ CREATE TABLE friend
     UNIQUE (user_id, friend_id)
 );
 
-
 CREATE TABLE chat
 (
-    chat_id         BIGINT,
-    user_id         BIGINT NOT NULL,
-    friend_id       BIGINT NOT NULL,
+    chat_id         BIGINT NOT NULL UNIQUE,
+    user_id         BIGINT NOT NULL UNIQUE,
+    friend_id       BIGINT NOT NULL UNIQUE,
     unread_messages BIGINT                   DEFAULT 0,
     last_message_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     viewed          BOOLEAN                  DEFAULT FALSE,
@@ -75,6 +72,30 @@ CREATE TABLE chat
 
     PRIMARY KEY (chat_id),
     FOREIGN KEY (user_id) REFERENCES Users (id),
-    FOREIGN KEY (friend_id) REFERENCES Users (id),
-    UNIQUE (user_id, friend_id)
-)
+    FOREIGN KEY (friend_id) REFERENCES Users (id)
+
+);
+
+CREATE TABLE muted_users
+(
+    chat_id    BIGINT    NOT NULL UNIQUE,
+    muter_id   BIGINT    NOT NULL UNIQUE,
+    muted_id   BIGINT    NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP,
+    PRIMARY KEY (muter_id, muted_id),
+    FOREIGN KEY (muter_id) REFERENCES users (id),
+    FOREIGN KEY (muted_id) REFERENCES users (id)
+);
+
+
+CREATE TABLE blocked_users
+(
+    id         BIGSERIAL,
+    blocker_id BIGINT    NOT NULL UNIQUE,
+    blocked_id BIGINT    NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (blocker_id, blocked_id),
+    FOREIGN KEY (blocker_id) REFERENCES users (id),
+    FOREIGN KEY (blocked_id) REFERENCES users (id)
+);

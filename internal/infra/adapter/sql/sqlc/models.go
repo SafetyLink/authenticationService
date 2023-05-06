@@ -15,6 +15,13 @@ type AccountSecurity struct {
 	DeviceID  int64
 }
 
+type BlockedUser struct {
+	ID        pgtype.Int8
+	BlockerID int64
+	BlockedID int64
+	CreatedAt pgtype.Timestamp
+}
+
 type Chat struct {
 	ChatID         int64
 	UserID         int64
@@ -31,6 +38,14 @@ type Friend struct {
 	FriendID  int64
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
+}
+
+type MutedUser struct {
+	ChatID    int64
+	MuterID   int64
+	MutedID   int64
+	CreatedAt pgtype.Timestamp
+	ExpiresAt pgtype.Timestamp
 }
 
 type Privacy struct {
