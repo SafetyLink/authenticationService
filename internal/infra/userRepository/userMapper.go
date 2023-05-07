@@ -41,7 +41,7 @@ func profileToModel(profile []sqlc.GetSelfRow) *types.User {
 	for _, k := range profile {
 		chat = append(chat, types.Chat{
 			ChatID:         k.ChatID,
-			UnreadMessages: k.UnreadMessages.Int64,
+			UnreadMessages: k.UnreadMessage.Int64,
 			LastMessageAt:  k.LastMessageAt.Time,
 			Viewed:         k.Viewed.Bool,
 			ViewedAt:       k.ViewedAt.Time,
