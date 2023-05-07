@@ -29,8 +29,8 @@ func userSecurityByEmailToModel(userSecurity sqlc.GetUserSecurityByEmailRow) *ty
 		UpdatedAt: userSecurity.UpdatedAt.Time,
 		Security: types.Security{
 			Password:  userSecurity.Password,
-			UpdatedAt: userSecurity.UpdatedAt_2.Time,
-			DeviceID:  userSecurity.DeviceID,
+			UpdatedAt: userSecurity.AccountSecurityUpdatedAt.Time,
+			DeviceID:  userSecurity.AccountDeviceID,
 		},
 	}
 }
@@ -38,18 +38,18 @@ func userSecurityByEmailToModel(userSecurity sqlc.GetUserSecurityByEmailRow) *ty
 func profileToModel(profile []sqlc.GetSelfRow) *types.User {
 	var chat []types.Chat
 
-	for _, k := range profile {
+	for _, u := range profile {
 		chat = append(chat, types.Chat{
-			ChatID:         k.ChatID,
-			UnreadMessages: k.UnreadMessage.Int64,
-			LastMessageAt:  k.LastMessageAt.Time,
-			Viewed:         k.Viewed.Bool,
-			ViewedAt:       k.ViewedAt.Time,
+			ChatID:         u.ChatID,
+			UnreadMessages: u.UnreadMessage.Int64,
+			LastMessageAt:  u.LastMessageAt.Time,
+			Viewed:         u.Viewed.Bool,
+			ViewedAt:       u.ViewedAt.Time,
 			Users: types.User{
-				ID:        k.FriendID,
-				Username:  k.FriendUsername,
-				FirstName: k.FirstName.String,
-				AvatarID:  k.FriendAvatarID.Int64,
+				ID:        u.FriendID,
+				Username:  u.FriendUsername,
+				FirstName: u.FirstName.String,
+				AvatarID:  u.FriendAvatarID.Int64,
 			},
 		})
 	}

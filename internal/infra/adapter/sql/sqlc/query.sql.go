@@ -212,7 +212,17 @@ func (q *Queries) GetUserFriends(ctx context.Context, userID int64) ([]GetUserFr
 }
 
 const getUserSecurityByEmail = `-- name: GetUserSecurityByEmail :one
-SELECT id, username, email, first_name, last_name, avatar_id, created_at, users.updated_at, user_id, password, account_security.updated_at, device_id
+SELECT users.id,
+       users.username,
+       users.email,
+       users.first_name,
+       users.last_name,
+       users.avatar_id,
+       users.created_at,
+       users.updated_at,
+       account_security.password,
+       account_security.updated_at as account_security_updated_at,
+       account_security.device_id  as account_device_id
 from users
          INNER JOIN account_security ON users.id = account_security.user_id
 WHERE users.email = $1
@@ -220,18 +230,17 @@ LIMIT 1
 `
 
 type GetUserSecurityByEmailRow struct {
-	ID          int64
-	Username    string
-	Email       string
-	FirstName   pgtype.Text
-	LastName    pgtype.Text
-	AvatarID    pgtype.Int8
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
-	UserID      int64
-	Password    string
-	UpdatedAt_2 pgtype.Timestamptz
-	DeviceID    int64
+	ID                       int64
+	Username                 string
+	Email                    string
+	FirstName                pgtype.Text
+	LastName                 pgtype.Text
+	AvatarID                 pgtype.Int8
+	CreatedAt                pgtype.Timestamptz
+	UpdatedAt                pgtype.Timestamptz
+	Password                 string
+	AccountSecurityUpdatedAt pgtype.Timestamptz
+	AccountDeviceID          int64
 }
 
 func (q *Queries) GetUserSecurityByEmail(ctx context.Context, email string) (GetUserSecurityByEmailRow, error) {
@@ -246,10 +255,9 @@ func (q *Queries) GetUserSecurityByEmail(ctx context.Context, email string) (Get
 		&i.AvatarID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.UserID,
 		&i.Password,
-		&i.UpdatedAt_2,
-		&i.DeviceID,
+		&i.AccountSecurityUpdatedAt,
+		&i.AccountDeviceID,
 	)
 	return i, err
 }

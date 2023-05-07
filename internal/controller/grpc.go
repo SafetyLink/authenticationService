@@ -2,11 +2,8 @@ package controller
 
 import (
 	"buf.build/gen/go/asavor/safetylink/grpc/go/authentication/v1/authenticationv1grpc"
-	authenticationv1 "buf.build/gen/go/asavor/safetylink/protocolbuffers/go/authentication/v1"
-	"context"
 	"github.com/SafetyLink/authenticationService/internal/domain/repo"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"net"
 )
 
@@ -36,22 +33,4 @@ func NewAuthenticationServiceGrpcServer(lis net.Listener, userRepo repo.User) *A
 		Gs:  s,
 		Lis: lis,
 	}
-}
-
-func (as *UserService) GetUserByID(ctx context.Context, in *authenticationv1.GetUserByIDRequest) (*authenticationv1.GetUserByIDResponse, error) {
-	user, err := as.userRepo.GetUserByID(ctx, in.GetUserId())
-	if err != nil {
-		return nil, err
-	}
-
-	return &authenticationv1.GetUserByIDResponse{
-		UserId:    user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		Firstname: user.FirstName,
-		Lastname:  user.LastName,
-		AvatarId:  user.AvatarID,
-		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: timestamppb.New(user.UpdatedAt),
-	}, nil
 }

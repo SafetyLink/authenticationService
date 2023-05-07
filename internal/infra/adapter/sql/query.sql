@@ -11,7 +11,17 @@ WHERE users.id = $1
 LIMIT 1;
 
 -- name: GetUserSecurityByEmail :one
-SELECT *
+SELECT users.id,
+       users.username,
+       users.email,
+       users.first_name,
+       users.last_name,
+       users.avatar_id,
+       users.created_at,
+       users.updated_at,
+       account_security.password,
+       account_security.updated_at as account_security_updated_at,
+       account_security.device_id  as account_device_id
 from users
          INNER JOIN account_security ON users.id = account_security.user_id
 WHERE users.email = $1
