@@ -62,11 +62,11 @@ CREATE TABLE friend
 CREATE TABLE chat
 (
     chat_id         BIGINT NOT NULL UNIQUE,
-    user_id         BIGINT NOT NULL UNIQUE,
-    friend_id       BIGINT NOT NULL UNIQUE,
-    unread_messages BIGINT                   DEFAULT 0,
+    user_id         BIGINT NOT NULL,
+    friend_id       BIGINT NOT NULL,
+    unread_message  BIGINT                   DEFAULT 0,
     last_message_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    viewed          BOOLEAN                  DEFAULT FALSE,
+    viewed          BOOLEAN                  DEFAULT TRUE,
     viewed_at       TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
 
@@ -79,8 +79,8 @@ CREATE TABLE chat
 CREATE TABLE muted_users
 (
     chat_id    BIGINT    NOT NULL UNIQUE,
-    muter_id   BIGINT    NOT NULL UNIQUE,
-    muted_id   BIGINT    NOT NULL UNIQUE,
+    muter_id   BIGINT    NOT NULL,
+    muted_id   BIGINT    NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP,
     PRIMARY KEY (muter_id, muted_id),
@@ -92,8 +92,8 @@ CREATE TABLE muted_users
 CREATE TABLE blocked_users
 (
     id         BIGSERIAL,
-    blocker_id BIGINT    NOT NULL UNIQUE,
-    blocked_id BIGINT    NOT NULL UNIQUE,
+    blocker_id BIGINT    NOT NULL,
+    blocked_id BIGINT    NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (blocker_id, blocked_id),
     FOREIGN KEY (blocker_id) REFERENCES users (id),

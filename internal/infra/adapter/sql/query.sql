@@ -10,7 +10,6 @@ from users
 WHERE users.id = $1
 LIMIT 1;
 
-
 -- name: GetUserSecurityByEmail :one
 SELECT *
 from users
@@ -23,6 +22,28 @@ SELECT *
 from users
 WHERE users.username = $1
 LIMIT 1;
+
+-- name: GetSelf :many
+SELECT u.id,
+       u.username,
+       u.email,
+       u.first_name,
+       u.last_name,
+       u.avatar_id,
+       u.created_at,
+       u.updated_at,
+       chat.chat_id,
+       chat.unread_message,
+       chat.last_message_at,
+       chat.viewed,
+       chat.viewed_at,
+       friend.id        AS friend_id,
+       friend.username  AS friend_username,
+       friend.avatar_id AS friend_avatar_id
+FROM users u
+         INNER JOIN chat ON (u.id = chat.user_id OR u.id = chat.friend_id)
+         INNER JOIN users friend ON (chat.user_id = friend.id OR chat.friend_id = friend.id) AND friend.id != u.id
+WHERE u.id = $1;
 
 
 -- name: GetUserFriends :many

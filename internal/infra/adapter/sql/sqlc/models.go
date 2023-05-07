@@ -23,13 +23,13 @@ type BlockedUser struct {
 }
 
 type Chat struct {
-	ChatID         int64
-	UserID         int64
-	FriendID       int64
-	UnreadMessages pgtype.Int8
-	LastMessageAt  pgtype.Timestamptz
-	Viewed         pgtype.Bool
-	ViewedAt       pgtype.Timestamptz
+	ChatID        int64
+	UserID        int64
+	FriendID      int64
+	UnreadMessage pgtype.Int8
+	LastMessageAt pgtype.Timestamptz
+	Viewed        pgtype.Bool
+	ViewedAt      pgtype.Timestamptz
 }
 
 type Friend struct {

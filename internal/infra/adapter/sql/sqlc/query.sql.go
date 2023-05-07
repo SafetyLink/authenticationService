@@ -11,6 +11,85 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getSelf = `-- name: GetSelf :many
+SELECT u.id,
+       u.username,
+       u.email,
+       u.first_name,
+       u.last_name,
+       u.avatar_id,
+       u.created_at,
+       u.updated_at,
+       chat.chat_id,
+       chat.unread_message,
+       chat.last_message_at,
+       chat.viewed,
+       chat.viewed_at,
+       friend.id        AS friend_id,
+       friend.username  AS friend_username,
+       friend.avatar_id AS friend_avatar_id
+FROM users u
+         INNER JOIN chat ON (u.id = chat.user_id OR u.id = chat.friend_id)
+         INNER JOIN users friend ON (chat.user_id = friend.id OR chat.friend_id = friend.id) AND friend.id != u.id
+WHERE u.id = $1
+`
+
+type GetSelfRow struct {
+	ID             int64
+	Username       string
+	Email          string
+	FirstName      pgtype.Text
+	LastName       pgtype.Text
+	AvatarID       pgtype.Int8
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
+	ChatID         int64
+	UnreadMessage  pgtype.Int8
+	LastMessageAt  pgtype.Timestamptz
+	Viewed         pgtype.Bool
+	ViewedAt       pgtype.Timestamptz
+	FriendID       int64
+	FriendUsername string
+	FriendAvatarID pgtype.Int8
+}
+
+func (q *Queries) GetSelf(ctx context.Context, id int64) ([]GetSelfRow, error) {
+	rows, err := q.db.Query(ctx, getSelf, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSelfRow
+	for rows.Next() {
+		var i GetSelfRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.Email,
+			&i.FirstName,
+			&i.LastName,
+			&i.AvatarID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ChatID,
+			&i.UnreadMessage,
+			&i.LastMessageAt,
+			&i.Viewed,
+			&i.ViewedAt,
+			&i.FriendID,
+			&i.FriendUsername,
+			&i.FriendAvatarID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT username,
        email,
