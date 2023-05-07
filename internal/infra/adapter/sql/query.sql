@@ -51,8 +51,8 @@ SELECT u.id,
        friend.username  AS friend_username,
        friend.avatar_id AS friend_avatar_id
 FROM users u
-         INNER JOIN chat ON (u.id = chat.user_id OR u.id = chat.friend_id)
-         INNER JOIN users friend ON (chat.user_id = friend.id OR chat.friend_id = friend.id) AND friend.id != u.id
+         LEFT JOIN chat ON (u.id = chat.user_id OR u.id = chat.friend_id)
+         LEFT JOIN users friend ON (chat.user_id = friend.id OR chat.friend_id = friend.id) AND friend.id != u.id
 WHERE u.id = $1;
 
 

@@ -27,7 +27,7 @@ func userSecurityByEmailToModel(userSecurity sqlc.GetUserSecurityByEmailRow) *ty
 		AvatarID:  userSecurity.AvatarID.Int64,
 		CreatedAt: userSecurity.CreatedAt.Time,
 		UpdatedAt: userSecurity.UpdatedAt.Time,
-		Security: types.Security{
+		Security: &types.Security{
 			Password:  userSecurity.Password,
 			UpdatedAt: userSecurity.AccountSecurityUpdatedAt.Time,
 			DeviceID:  userSecurity.AccountDeviceID,
@@ -36,22 +36,24 @@ func userSecurityByEmailToModel(userSecurity sqlc.GetUserSecurityByEmailRow) *ty
 }
 
 func profileToModel(profile []sqlc.GetSelfRow) *types.User {
-	var chat []types.Chat
-
-	for _, u := range profile {
-		chat = append(chat, types.Chat{
-			ChatID:         u.ChatID,
-			UnreadMessages: u.UnreadMessage.Int64,
-			LastMessageAt:  u.LastMessageAt.Time,
-			Viewed:         u.Viewed.Bool,
-			ViewedAt:       u.ViewedAt.Time,
-			Users: types.User{
-				ID:        u.FriendID,
-				Username:  u.FriendUsername,
-				FirstName: u.FirstName.String,
-				AvatarID:  u.FriendAvatarID.Int64,
-			},
-		})
+	var chats []*types.Chat
+	if profile[0].ChatID.Int64 != 0 {
+		for _, u := range profile {
+			chats = append(chats, &types.Chat{
+				ChatID:         u.ChatID.Int64,
+				UnreadMessages: u.UnreadMessage.Int64,
+				LastMessageAt:  u.LastMessageAt.Time,
+				Viewed:         u.Viewed.Bool,
+				ViewedAt:       u.ViewedAt.Time,
+				Users: &types.ChatUser{
+					ID:       u.FriendID.Int64,
+					Username: u.FriendUsername.String,
+					AvatarID: u.FriendAvatarID.Int64,
+				},
+			})
+		}
+	} else {
+		chats = []*types.Chat{}
 	}
 
 	return &types.User{
@@ -62,7 +64,7 @@ func profileToModel(profile []sqlc.GetSelfRow) *types.User {
 		AvatarID:  profile[0].AvatarID.Int64,
 		CreatedAt: profile[0].CreatedAt.Time,
 		UpdatedAt: profile[0].UpdatedAt.Time,
-		Chat:      chat,
+		Chat:      chats,
 	}
 
 }

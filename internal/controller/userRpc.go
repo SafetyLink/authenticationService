@@ -29,10 +29,10 @@ func (as *UserService) GetSelf(ctx context.Context, in *authenticationv1.GetSelf
 	if err != nil {
 		return nil, err
 	}
-	var chat []*authenticationv1.Chat
+	var chats []*authenticationv1.Chat
 
 	for _, c := range user.Chat {
-		chat = append(chat, &authenticationv1.Chat{
+		chats = append(chats, &authenticationv1.Chat{
 			ChatId:        c.ChatID,
 			UnreadMessage: c.UnreadMessages,
 			LastMessageAt: timestamppb.New(c.LastMessageAt),
@@ -53,6 +53,6 @@ func (as *UserService) GetSelf(ctx context.Context, in *authenticationv1.GetSelf
 		AvatarId:  user.AvatarID,
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
-		Chats:     chat,
+		Chats:     chats,
 	}, nil
 }
