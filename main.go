@@ -9,6 +9,7 @@ import (
 	"github.com/SafetyLink/authenticationService/internal/infra/userRepository"
 	"github.com/SafetyLink/commons/config"
 	"github.com/SafetyLink/commons/logger"
+	"github.com/SafetyLink/commons/otel"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"net"
@@ -18,6 +19,7 @@ func main() {
 	fx.New(
 		fx.Provide(logger.InitLogger),
 		fx.Provide(config.ReadConfig[internal.Config]),
+		fx.Provide(otel.InitTracer),
 
 		fx.Provide(sql.NewPostgresProvider),
 
