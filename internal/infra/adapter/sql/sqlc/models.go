@@ -11,7 +11,7 @@ import (
 type AccountSecurity struct {
 	UserID    int64
 	Password  string
-	UpdatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamp
 	DeviceID  int64
 }
 
@@ -27,17 +27,17 @@ type Chat struct {
 	UserID        int64
 	FriendID      int64
 	UnreadMessage pgtype.Int8
-	LastMessageAt pgtype.Timestamptz
+	LastMessageAt pgtype.Timestamp
 	Viewed        pgtype.Bool
-	ViewedAt      pgtype.Timestamptz
+	ViewedAt      pgtype.Timestamp
 }
 
 type Friend struct {
 	ID        int64
 	UserID    int64
 	FriendID  int64
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }
 
 type MutedUser struct {
@@ -60,6 +60,8 @@ type Session struct {
 	DeviceID  string
 	DeviceOs  string
 	IpAddress string
+	LastSeen  pgtype.Timestamp
+	CreatedAt pgtype.Timestamp
 }
 
 type User struct {
@@ -69,6 +71,6 @@ type User struct {
 	FirstName pgtype.Text
 	LastName  pgtype.Text
 	AvatarID  pgtype.Int8
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }

@@ -1,6 +1,6 @@
 version: 2
 sql:
-  - schema: "internal/infra/adapter/sql/schema.sql"
+  - schema: "internal/infra/adapter/sql/migrations"
     queries: "internal/infra/adapter/sql/query.sql"
     engine: "postgresql"
     gen:

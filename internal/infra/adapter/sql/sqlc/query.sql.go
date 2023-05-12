@@ -41,13 +41,13 @@ type GetSelfRow struct {
 	FirstName      pgtype.Text
 	LastName       pgtype.Text
 	AvatarID       pgtype.Int8
-	CreatedAt      pgtype.Timestamptz
-	UpdatedAt      pgtype.Timestamptz
+	CreatedAt      pgtype.Timestamp
+	UpdatedAt      pgtype.Timestamp
 	ChatID         pgtype.Int8
 	UnreadMessage  pgtype.Int8
-	LastMessageAt  pgtype.Timestamptz
+	LastMessageAt  pgtype.Timestamp
 	Viewed         pgtype.Bool
-	ViewedAt       pgtype.Timestamptz
+	ViewedAt       pgtype.Timestamp
 	FriendID       pgtype.Int8
 	FriendUsername pgtype.Text
 	FriendAvatarID pgtype.Int8
@@ -109,8 +109,8 @@ type GetUserByIDRow struct {
 	FirstName pgtype.Text
 	LastName  pgtype.Text
 	AvatarID  pgtype.Int8
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
@@ -178,8 +178,8 @@ type GetUserFriendsRow struct {
 	FirstName pgtype.Text
 	LastName  pgtype.Text
 	AvatarID  pgtype.Int8
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
 }
 
 func (q *Queries) GetUserFriends(ctx context.Context, userID int64) ([]GetUserFriendsRow, error) {
@@ -236,10 +236,10 @@ type GetUserSecurityByEmailRow struct {
 	FirstName                pgtype.Text
 	LastName                 pgtype.Text
 	AvatarID                 pgtype.Int8
-	CreatedAt                pgtype.Timestamptz
-	UpdatedAt                pgtype.Timestamptz
+	CreatedAt                pgtype.Timestamp
+	UpdatedAt                pgtype.Timestamp
 	Password                 string
-	AccountSecurityUpdatedAt pgtype.Timestamptz
+	AccountSecurityUpdatedAt pgtype.Timestamp
 	AccountDeviceID          int64
 }
 
