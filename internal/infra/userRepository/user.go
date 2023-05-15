@@ -11,8 +11,8 @@ import (
 type userRepository struct {
 	database *sqlc.Queries
 	db       *pgx.Conn
-	tracer   trace.Tracer
 	logger   *zap.Logger
+	tracer   trace.Tracer
 }
 
 func NewUserRepository(database *pgx.Conn, logger *zap.Logger, tracer trace.Tracer) repo.User {

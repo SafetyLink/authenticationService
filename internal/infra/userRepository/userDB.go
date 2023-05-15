@@ -2,39 +2,42 @@ package userRepository
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"github.com/SafetyLink/commons/errors"
-	"go.opentelemetry.io/otel/attribute"
-
 	"github.com/SafetyLink/commons/otel"
 	"github.com/SafetyLink/commons/types"
+	"github.com/jackc/pgx/v5"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 func (ur *userRepository) GetUserByID(ctx context.Context, userID int64) (*types.User, error) {
-	ctx, span := ur.tracer.Start(ctx, "userRepo.getUserByID")
+	ctx, span := ur.tracer.Start(ctx, "userRepo.postgres.getUserSecurityByEmail", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	userResult, err := ur.database.GetUserByID(ctx, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.ErrNotFound
 		} else {
-			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, ur.logger, attribute.Int("user-id", int(userID)))
+			ur.logger.Error("un caught error", zap.Error(err))
+			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, attribute.Int("user-id", int(userID)))
 		}
 	}
 	return userByIDToModel(userResult), nil
 }
 
 func (ur *userRepository) GetUserSecurityByEmail(ctx context.Context, email string) (*types.User, error) {
-	ctx, span := ur.tracer.Start(ctx, "userRepo.getUserSecurityByEmail")
+	ctx, span := ur.tracer.Start(ctx, "userRepo.postgres.getUserSecurityByEmail", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
 	userResult, err := ur.database.GetUserSecurityByEmail(ctx, email)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.ErrNotFound
 		} else {
-
-			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, ur.logger, attribute.String("user-email", email))
+			ur.logger.Error("un caught error", zap.Error(err))
+			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, attribute.String("user-email", email))
 		}
 	}
 
@@ -42,19 +45,18 @@ func (ur *userRepository) GetUserSecurityByEmail(ctx context.Context, email stri
 }
 
 func (ur *userRepository) GetSelf(ctx context.Context, userID int64) (*types.User, error) {
-	ctx, span := ur.tracer.Start(ctx, "userRepo.getSelf")
+	ctx, span := ur.tracer.Start(ctx, "userRepo.postgres.getSelf")
 	defer span.End()
 
 	userResult, err := ur.database.GetSelf(ctx, userID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.ErrNotFound
 		} else {
-			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, ur.logger, attribute.Int("user-id", int(userID)))
+			ur.logger.Error("un caught error", zap.Error(err))
+			return nil, otel.RecordErrorWithAttribute(errors.ErrInternal, err, "un caught error", span, attribute.Int("user-id", int(userID)))
 		}
 	}
-
-	fmt.Println(userResult)
 
 	return profileToModel(userResult), nil
 }

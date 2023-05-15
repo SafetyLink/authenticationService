@@ -2,18 +2,14 @@ package controller
 
 import (
 	"buf.build/gen/go/asavor/safetylink/grpc/go/authentication/v1/authenticationv1grpc"
+	"github.com/SafetyLink/authenticationService/internal/domain/authenticationService"
 	"github.com/SafetyLink/authenticationService/internal/domain/repo"
 	"google.golang.org/grpc"
-	"net"
 )
-
-type AuthenticationServiceGrpcServer struct {
-	Gs  *grpc.Server
-	Lis net.Listener
-}
 
 type AuthService struct {
 	authenticationv1grpc.UnimplementedAuthenticationServiceServer
+	authenticationSrv authenticationService.Repo
 }
 
 type UserService struct {
@@ -21,16 +17,15 @@ type UserService struct {
 	userRepo repo.User
 }
 
-func NewAuthenticationServiceGrpcServer(lis net.Listener, userRepo repo.User) *AuthenticationServiceGrpcServer {
-	s := grpc.NewServer()
+func RegisterAuthenticationService(s *grpc.Server, authenticationSrv authenticationService.Repo) {
+	authenticationv1grpc.RegisterAuthenticationServiceServer(s, &AuthService{
+		authenticationSrv: authenticationSrv,
+	})
+}
 
+func RegisterUserService(s *grpc.Server, userRepo repo.User) {
 	authenticationv1grpc.RegisterUserServiceServer(s, &UserService{
 		userRepo: userRepo,
 	})
-	authenticationv1grpc.RegisterAuthenticationServiceServer(s, &AuthService{})
 
-	return &AuthenticationServiceGrpcServer{
-		Gs:  s,
-		Lis: lis,
-	}
 }

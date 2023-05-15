@@ -3,7 +3,6 @@ package controller
 import (
 	authenticationv1 "buf.build/gen/go/asavor/safetylink/protocolbuffers/go/authentication/v1"
 	"context"
-	"fmt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -44,8 +43,6 @@ func (as *UserService) GetSelf(ctx context.Context, in *authenticationv1.GetSelf
 			AvatarId:      c.Users.AvatarID,
 		})
 	}
-
-	fmt.Println(chats)
 
 	return &authenticationv1.GetSelfResponse{
 		UserId:    user.ID,
