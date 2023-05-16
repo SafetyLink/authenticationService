@@ -1,19 +1,21 @@
 package userRepository
 
 import (
+	authenticationv1 "buf.build/gen/go/asavor/safetylink/protocolbuffers/go/authentication/v1"
 	"github.com/SafetyLink/authenticationService/internal/infra/adapter/sql/sqlc"
 	"github.com/SafetyLink/commons/types"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func userByIDToModel(userResult sqlc.GetUserByIDRow) *types.User {
-	return &types.User{
+func userByIDToModel(userResult sqlc.GetUserByIDRow) *authenticationv1.GetUserByIDResponse {
+	return &authenticationv1.GetUserByIDResponse{
 		Username:  userResult.Username,
 		Email:     userResult.Email,
-		FirstName: userResult.FirstName.String,
-		LastName:  userResult.LastName.String,
-		AvatarID:  userResult.AvatarID.Int64,
-		CreatedAt: userResult.CreatedAt.Time,
-		UpdatedAt: userResult.UpdatedAt.Time,
+		Firstname: userResult.FirstName.String,
+		Lastname:  userResult.LastName.String,
+		AvatarId:  userResult.AvatarID.Int64,
+		CreatedAt: timestamppb.New(userResult.CreatedAt.Time),
+		UpdatedAt: timestamppb.New(userResult.UpdatedAt.Time),
 	}
 }
 
@@ -35,36 +37,35 @@ func userSecurityByEmailToModel(userSecurity sqlc.GetUserSecurityByEmailRow) *ty
 	}
 }
 
-func profileToModel(profile []sqlc.GetSelfRow) *types.User {
-	var chats []*types.Chat
-	if profile[0].ChatID.Int64 != 0 {
-		for _, u := range profile {
-			chats = append(chats, &types.Chat{
-				ChatID:         u.ChatID.Int64,
-				UnreadMessages: u.UnreadMessage.Int64,
-				LastMessageAt:  u.LastMessageAt.Time,
-				Viewed:         u.Viewed.Bool,
-				ViewedAt:       u.ViewedAt.Time,
-				Users: &types.ChatUser{
-					ID:       u.FriendID.Int64,
-					Username: u.FriendUsername.String,
-					AvatarID: u.FriendAvatarID.Int64,
-				},
+func selfToModel(selfProfile []sqlc.GetSelfRow) *authenticationv1.GetSelfResponse {
+	var chats []*authenticationv1.Chat
+
+	if selfProfile[0].ChatID.Int64 != 0 {
+		for _, u := range selfProfile {
+			chats = append(chats, &authenticationv1.Chat{
+				ChatId:        u.ChatID.Int64,
+				UnreadMessage: u.UnreadMessage.Int64,
+				LastMessageAt: timestamppb.New(u.LastMessageAt.Time),
+				Viewed:        u.Viewed.Bool,
+				ViewedAt:      timestamppb.New(u.ViewedAt.Time),
+				UserId:        u.FriendID.Int64,
+				Username:      u.FriendUsername.String,
+				AvatarId:      u.FriendAvatarID.Int64,
 			})
 		}
 	} else {
-		chats = []*types.Chat{}
+		chats = []*authenticationv1.Chat{}
 	}
 
-	return &types.User{
-		Username:  profile[0].Username,
-		Email:     profile[0].Email,
-		FirstName: profile[0].FirstName.String,
-		LastName:  profile[0].LastName.String,
-		AvatarID:  profile[0].AvatarID.Int64,
-		CreatedAt: profile[0].CreatedAt.Time,
-		UpdatedAt: profile[0].UpdatedAt.Time,
-		Chat:      chats,
+	return &authenticationv1.GetSelfResponse{
+		UserId:    selfProfile[0].ID,
+		Username:  selfProfile[0].Username,
+		Email:     selfProfile[0].Email,
+		Firstname: selfProfile[0].FirstName.String,
+		Lastname:  selfProfile[0].LastName.String,
+		AvatarId:  selfProfile[0].AvatarID.Int64,
+		CreatedAt: timestamppb.New(selfProfile[0].CreatedAt.Time),
+		UpdatedAt: timestamppb.New(selfProfile[0].UpdatedAt.Time),
+		Chats:     chats,
 	}
-
 }

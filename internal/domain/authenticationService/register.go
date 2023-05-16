@@ -3,36 +3,34 @@ package authenticationService
 import (
 	"context"
 	"github.com/SafetyLink/commons/errors"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func (as *Authentication) Register(ctx context.Context, username, email, password string) (int64, error) {
-
-	//ctx, span := as.tracer.Start(ctx, "authenticationSrv.register")
-	//defer span.End()
+func (as *Authentication) Register(ctx context.Context, username, email, password string) (string, error) {
+	ctx, span := as.tracer.Start(ctx, "authenticationService.Register", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
 	userByEmail, err := as.userRepo.GetUserSecurityByEmail(ctx, email)
 	if errors.Is(err, errors.ErrNotFound) {
-		return -1, errors.ErrNotFound
+		return "", errors.ErrNotFound
 	}
 	if userByEmail != nil {
-		return -1, errors.New("email already exist")
+		return "", errors.New("email already exist")
 	}
 
 	userByUsername, err := as.userRepo.GetUserSecurityByEmail(ctx, username)
 	if errors.Is(err, errors.ErrNotFound) {
-		return -1, errors.ErrNotFound
+		return "", errors.ErrNotFound
 	}
 	if userByUsername != nil {
-		return -1, errors.New("username already exist")
+		return "", errors.New("username already exist")
 	}
 
 	_, err = as.bcryptRepo.GenerateFromPassword(ctx, password)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 
-	userID := int64(1)
-
-	return userID, nil
+	return "userID", nil
 
 }

@@ -8,8 +8,8 @@ import (
 )
 
 type Repo interface {
-	Login(ctx context.Context, email, password string) (int64, error)
-	Register(ctx context.Context, username, email, password string) (int64, error)
+	Login(ctx context.Context, email, password string) (string, error)
+	Register(ctx context.Context, username, email, password string) (string, error)
 }
 
 type Authentication struct {
